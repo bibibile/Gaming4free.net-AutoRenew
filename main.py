@@ -6,8 +6,9 @@ from DrissionPage import ChromiumPage, ChromiumOptions
 
 # --- 配置区 ----
 URL = "https://g4f.gg/nidaye"
-TARGET_HOURS = 72
-MAX_LOOPS = 20
+TARGET_HOURS = 48          # 达到 48 小时停止续期
+COOLDOWN_MINUTES = 31      # ⚠️ 修改这里：改成 31 分钟 (预留 1 分钟容错)
+MAX_LOOPS = 50             # 建议稍微调高循环次数，配合更长的冷却时间
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
