@@ -1,23 +1,18 @@
-name: Robinson-Gaming4free.net-AutoRenew
- 
+name: G4F Auto Renew
+
 on:
   schedule:
-    - cron: '23 18 */2 * *'
-  workflow_dispatch:
+    # 每天 UTC 时间 18:23 运行一次 (北京时间凌晨 2:23)
+    - cron: '23 18 * * *'
+  workflow_dispatch: # 允许手动点击运行按钮
 
 jobs:
   run-addtime:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 下载私库脚本
+      - name: 📥 获取本仓库代码
         uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository_owner }}/Robinson-Gaming4free.net-AutoRenew
-          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
-          path: private
-
-      - name: 📂 移动脚本到工作目录
-        run: mv private/main.py main.py
+        # 这里已经去掉了复杂的 token 和跨库拉取，直接读取本仓库的 main.py
 
       - name: 设置 Python 环境
         uses: actions/setup-python@v5
@@ -26,13 +21,11 @@ jobs:
 
       - name: 安装 Python 依赖及系统组件
         run: |
-          # 1. 升级基础构建工具，防止由于 GHA 镜像太旧导致编译失败
+          # 升级基础构建工具
           python -m pip install --upgrade pip setuptools wheel
-          
-          # 2. 显式安装 DrissionPage 及其所有可能漏掉的底层核心依赖
+          # 安装 DrissionPage 及其底层依赖
           pip install DrissionPage requests DataRecorder DownloadKit FlowViewer lxml websocket-client psutil
-          
-          # 3. 安装虚拟显示器
+          # 安装虚拟显示器
           sudo apt-get update
           sudo apt-get install -y xvfb
 
@@ -48,10 +41,11 @@ jobs:
           warp-cli --accept-tos connect
           
           sleep 5
-          echo " WARP 初始化完成"
+          echo "✅ WARP 初始化完成"
 
       - name: 运行续期脚本
         env:
+          # 确保您的仓库 Secrets 里有这两个变量
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
