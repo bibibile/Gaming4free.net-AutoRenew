@@ -5,7 +5,7 @@ import requests
 from DrissionPage import ChromiumPage, ChromiumOptions
 
 # --- 配置区 ----
-URL = "https://g4f.gg/mylovede"
+URL = "https://g4f.gg/nidaye"
 TARGET_HOURS = 72
 MAX_LOOPS = 20
 
@@ -92,6 +92,7 @@ def main():
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
     co.set_argument('--disable-dev-shm-usage')
+    co.set_argument('--disable-crash-reporter') # 增加崩溃报告禁用，提升无头环境稳定性
     
     page = ChromiumPage(co)
     page.set.timeouts(page_load=15)
