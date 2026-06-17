@@ -108,7 +108,15 @@ def main():
     current_ip = get_current_ip()
     print(f"🚀 初始运行 IP: {current_ip}")
     
+    # 👑 新增：记录脚本刚启动时的时间戳
+    script_start_time = time.time() 
+    
     while loop_count < MAX_LOOPS:
+        # 👑 新增：每次循环前检查是否超过 5.5 小时 (19800 秒)
+        if time.time() - script_start_time > 5.5 * 3600:
+            print("⏰ 接近 GitHub Actions 的 6 小时强制死亡线，为保证发送最终战报，主动体面退出！")
+            break
+
         loop_count += 1
         print(f"\n" + "="*40)
         print(f"▶️ 第 {loop_count}/{MAX_LOOPS} 次尝试开始")
