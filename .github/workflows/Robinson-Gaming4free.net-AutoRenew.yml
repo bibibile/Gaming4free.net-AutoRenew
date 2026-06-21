@@ -2,7 +2,7 @@ name: G4F Auto Renew
 
 on:
   schedule:
-    - cron: '23 0,8,16 * * *'  # 每天 0点, 8点, 16点的 23 分运行
+    - cron: '23 16 * * *'  # 每天 0点, 8点, 16点的 23 分运行
   workflow_dispatch:
 
 jobs:
