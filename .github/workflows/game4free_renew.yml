@@ -1,0 +1,66 @@
+name: Game4Free-Renew
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 📥 下载私库脚本
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/ActionNode-Start-Private
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: private
+
+      - name: 📂 移动脚本到工作目录
+        run: mv private/game4free_renew.py game4free_renew.py
+
+      - name: 🐍 设置 Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 📦 下载 GOST
+        run: |
+          VERSION=$(curl -s https://api.github.com/repos/ginuerzh/gost/releases/latest \
+            | grep '"tag_name"' | cut -d'"' -f4 | tr -d 'v')
+          echo "📦 GOST 版本: $VERSION"
+          wget -q "https://github.com/ginuerzh/gost/releases/download/v${VERSION}/gost_${VERSION}_linux_amd64.tar.gz"
+          tar -xzf "gost_${VERSION}_linux_amd64.tar.gz"
+          chmod +x gost
+
+      - name: 🛠️ 安装系统依赖
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y \
+            google-chrome-stable \
+            xvfb \
+            xdotool
+
+      - name: 🐍 安装 Python 依赖
+        run: pip install seleniumbase
+
+      - name: 🔧 安装 ChromeDriver
+        run: seleniumbase install chromedriver
+
+      - name: 🚀 运行续期脚本
+        env:
+          PYTHONIOENCODING: utf-8
+          TG_BOT: ${{ secrets.TG_BOT }}
+          GAME4FREE_ACCOUNT: ${{ secrets.GAME4FREE_ACCOUNT }}
+          GAME4FREE_PROXY: ${{ secrets.GAME4FREE_PROXY }}
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" \
+            python game4free_renew.py
+
+      - name: 📸 上传截图
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshots
+          path: "*.png"
